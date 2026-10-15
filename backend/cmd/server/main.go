@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/joho/godotenv"
 
 	"webstore/handlers"
 	"webstore/services"
@@ -14,10 +16,14 @@ import (
 
 func main() {
 	ctx := context.Background()
+
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found; using system environment variables")
+	}
 	dsn := os.Getenv("DATABASE_URL")
-	//if dsn == "" {
-	//	dsn = "postgresql://postgres:postgres@localhost:5432/postgres"
-	//}
+	if dsn == "" {
+		log.Fatal("DATABASE_URL is not set")
+	}
 	conn, err := pgx.Connect(ctx, dsn)
 	if err != nil {
 		panic(err)
